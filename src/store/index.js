@@ -7,8 +7,9 @@ Vue.use(Vuex);//vue的插件机制
 const store = new Vuex.Store({
   plugins: [persistence()],
   state: {
-    count: 100,
-    obj: { name: '李华', age: 20 }
+    safeArea: uni.getSystemInfoSync().safeAreaInsets,
+    capsule: uni.getMenuButtonBoundingClientRect()
+
   },
   getters: {},
   mutations: {

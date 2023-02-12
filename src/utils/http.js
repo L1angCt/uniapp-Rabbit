@@ -29,7 +29,7 @@ export default (options) => {
                 }
             },
             fail(err) {
-                reject(res);
+                reject(err);
             },
         });
     });
