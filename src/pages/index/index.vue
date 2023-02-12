@@ -2,7 +2,7 @@
     <view class="content">
         <!-- 1.自定义导航 -->
         <Navbar> </Navbar>
-        <scroll-view scroll-y class="main">
+        <scroll-view scroll-y class="main" @scrolltolower="scrolltolower">
             <!-- 2.轮播图 -->
             <Carousel :banners="banners" height="280rpx"></Carousel>
             <!-- 3.分类栏目 -->
@@ -53,14 +53,22 @@ export default {
         this.getHomeCatgoryMutli()
         this.getHomeHotMutli()
         this.getHomeNewList()
+        //
+        this.loading = false
+        // 猜你喜欢
+        this.guessPages = 1
+        this.guessParams = { page: 1, pageSize: 10 };
         this.getHomeGoodsGuessLike()
     },
     data() {
         return {
             banners: [],
             categoryHeadMutli: [],
+            // 人气推荐
             hotMutli: [],
+            // 新鲜好物
             homeNew: [],
+            // 猜你喜欢
             homeGoodsGuessLike: []
         };
     },
@@ -85,13 +93,26 @@ export default {
         // 新鲜好物
         async getHomeNewList() {
             const res = await getHomeNewList()
-            console.log('res11111111111', res);
             this.homeNew = res.result
         },
         // 猜你喜欢
         async getHomeGoodsGuessLike() {
-            const res = await getHomeGoodsGuessLike()
-            this.homeGoodsGuessLike = res.result.items
+            const res = await getHomeGoodsGuessLike(this.guessParams);
+            this.homeGoodsGuessLike = [...this.homeGoodsGuessLike, ...res.result.items];
+            this.guessPages = res.result.pages
+        },
+        // 滑动到底部
+        async scrolltolower(e) {
+            if (this.loading) {
+                return
+            }
+            if (this.guessParams.page < this.guessPages) {
+                this.loading = true
+                this.guessParams.page++
+                await this.getHomeGoodsGuessLike(this.guessParams);
+                this.loading = false
+            }
+
         }
     },
 };

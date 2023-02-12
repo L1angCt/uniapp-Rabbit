@@ -12,6 +12,7 @@ export const getHomeBanner = (distributionSite = 1) => {
         },
     });
 };
+
 /**
  * 首页-前台分类-小程序
  */
@@ -43,8 +44,9 @@ export const getHomeNewList = (limit = 4) => {
 /**
  * 擦你喜欢
  */
-export const getHomeGoodsGuessLike = () => {
+export const getHomeGoodsGuessLike = (data) => {
     return http({
-        url: '/home/goods/guessLike'
+        url: '/home/goods/guessLike',
+        data
     })
 }
