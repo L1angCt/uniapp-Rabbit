@@ -1,36 +1,99 @@
 <template>
-    <view>
+    <view class="content">
+        <!-- 1.自定义导航 -->
         <Navbar> </Navbar>
-        <view @click="addCount(10)">调用addCount</view>
-        <view>123ysdfghjk</view>
-        <view>
-            {{ count }}{{ obj.name }}{{ obj.age }}
-        </view>
+        <scroll-view scroll-y class="main">
+            <!-- 2.轮播图 -->
+            <Carousel :banners="banners" height="280rpx"></Carousel>
+            <!-- 3.分类栏目 -->
+            <CateScroll :categoryHeadMutli="categoryHeadMutli"></CateScroll>
+            <!-- 4.人气推荐 -->
+            <view class="panel recommend">
+                <view class="item" v-for="item in hotMutli" :key="item.id">
+                    <view class="title">
+                        {{ item.title }}<text>{{ item.alt }}</text>
+                    </view>
+                    <navigator hover-class="none" :url="`/pages/recommend/index?type=${item.type}`" class="cards">
+                        <image mode="aspectFit" v-for="img in item.pictures" :key="img" :src="img"></image>
+                    </navigator>
+                </view>
+            </view>
+            <!-- 5.新鲜好物 -->
+            <view class="panel fresh">
+                <view class="title">
+                    新鲜好物
+                    <navigator hover-class="none" class="more" url="/pages/recommend/index?type=5">更多</navigator>
+                </view>
+                <view class="cards">
+                    <navigator hover-class="none" :url="`/pages/goods/index?id=${item.id}`" v-for="item in homeNew"
+                        :key="item.id">
+                        <image mode="aspectFit" :src="item.picture"></image>
+                        <view class="name">{{ item.name }}</view>
+                        <view class="price">
+                            <text class="small">¥</text>{{ item.price }}
+                        </view>
+                    </navigator>
+                </view>
+            </view>
+            <!-- 猜你喜欢 -->
+            <Guess :homeGoodsGuessLike="homeGoodsGuessLike"></Guess>
+        </scroll-view>
 
     </view>
 
 </template>
 
 <script>
-import http from '@/utils/http'
-import { mapMutations, mapState } from 'vuex'
+import { getHomeBanner, getHomeCatgoryMutli, getHomeHotMutli, getHomeNewList, getHomeGoodsGuessLike } from "@/api/home";
 import Navbar from './components/Navbar.vue'
 export default {
     components: { Navbar },
     async onLoad() {
-        const res = await http({ url: '/home/banner' })
-        console.log(res);
-    },
-    computed: {
-        ...mapState(['count', 'obj'])
+        this.getHomeBanner();
+        this.getHomeCatgoryMutli()
+        this.getHomeHotMutli()
+        this.getHomeNewList()
+        this.getHomeGoodsGuessLike()
     },
     data() {
         return {
-        }
+            banners: [],
+            categoryHeadMutli: [],
+            hotMutli: [],
+            homeNew: [],
+            homeGoodsGuessLike: []
+        };
+    },
+    computed: {
     },
     methods: {
-        ...mapMutations(['addCount'])
-    }
+        // 广告banner图
+        async getHomeBanner() {
+            const res = await getHomeBanner();
+            this.banners = res.result;
+        },
+        // 前台分类
+        async getHomeCatgoryMutli() {
+            const res = await getHomeCatgoryMutli()
+            this.categoryHeadMutli = res.result
+        },
+        // 热门推荐
+        async getHomeHotMutli() {
+            const res = await getHomeHotMutli()
+            this.hotMutli = res.result
+        },
+        // 新鲜好物
+        async getHomeNewList() {
+            const res = await getHomeNewList()
+            console.log('res11111111111', res);
+            this.homeNew = res.result
+        },
+        // 猜你喜欢
+        async getHomeGoodsGuessLike() {
+            const res = await getHomeGoodsGuessLike()
+            this.homeGoodsGuessLike = res.result.items
+        }
+    },
 };
 </script>
 
