@@ -15,7 +15,7 @@
         </view>
         <!-- 列表内容 -->
         <scroll-view scroll-y class="scroll-view" @scrolltolower="handleScrolltolower"
-            v-for="(item, index) in recommendList" :key="index" v-show="activeIndex === index" lower-threshold=200>
+            v-for="(item, index) in recommendList" :key="index" v-show="activeIndex === index" :lower-threshold='600'>
             <view class="goods">
                 <navigator hover-class="none" class="navigator" v-for="goods in item.goodsItems.items" :key="goods.id"
                     :url="`/pages/goods/index?id=${goods.id}`">
