@@ -2,7 +2,8 @@
     <view class="content">
         <!-- 1.自定义导航 -->
         <Navbar> </Navbar>
-        <scroll-view scroll-y class="main" @scrolltolower="scrolltolower">
+        <scroll-view scroll-y class="main" @scrolltolower="scrolltolower" refresher-enabled
+            @refresherrefresh="refresherrefresh" :refresher-triggered="refresherTriggered">
             <!-- 2.轮播图 -->
             <Carousel :banners="banners" height="280rpx"></Carousel>
             <!-- 3.分类栏目 -->
@@ -35,6 +36,39 @@
                     </navigator>
                 </view>
             </view>
+            <!-- 6.热门品牌 -->
+            <view class="panel brands">
+                <view class="title">
+                    热门品牌
+                    <navigator hover-class="none" class="more" url="/pages/list/index">更多</navigator>
+                </view>
+                <view class="cards">
+                    <navigator hover-class="none" url="/pages/goods/index">
+                        <image mode="aspectFit" src="http://static.botue.com/erabbit/static/uploads/brand_logo_1.jpg">
+                        </image>
+                        <view class="name">小米</view>
+                        <view class="price">99元起</view>
+                    </navigator>
+                    <navigator hover-class="none" url="/pages/goods/index">
+                        <image mode="aspectFit" src="http://static.botue.com/erabbit/static/uploads/brand_logo_2.jpg">
+                        </image>
+                        <view class="name">TCL</view>
+                        <view class="price">199起</view>
+                    </navigator>
+                    <navigator hover-class="none" url="/pages/goods/index">
+                        <image mode="aspectFit" src="http://static.botue.com/erabbit/static/uploads/brand_logo_3.jpg">
+                        </image>
+                        <view class="name">饭小宝</view>
+                        <view class="price">9.9起</view>
+                    </navigator>
+                    <navigator hover-class="none" url="/pages/goods/index">
+                        <image mode="aspectFit" src="http://static.botue.com/erabbit/static/uploads/brand_logo_4.jpg">
+                        </image>
+                        <view class="name">鳄鱼</view>
+                        <view class="price">299起</view>
+                    </navigator>
+                </view>
+            </view>
             <!-- 猜你喜欢 -->
             <Guess :homeGoodsGuessLike="homeGoodsGuessLike"></Guess>
         </scroll-view>
@@ -44,13 +78,13 @@
 </template>
 
 <script>
-import { getHomeBanner, getHomeCatgoryMutli, getHomeHotMutli, getHomeNewList, getHomeGoodsGuessLike } from "@/api/home";
+import { getHomeBanner, getHomeCategoryMutli, getHomeHotMutli, getHomeNewList, getHomeGoodsGuessLike } from "@/api/home";
 import Navbar from './components/Navbar.vue'
 export default {
     components: { Navbar },
     async onLoad() {
         this.getHomeBanner();
-        this.getHomeCatgoryMutli()
+        this.getHomeCategoryMutli()
         this.getHomeHotMutli()
         this.getHomeNewList()
         //
@@ -69,7 +103,8 @@ export default {
             // 新鲜好物
             homeNew: [],
             // 猜你喜欢
-            homeGoodsGuessLike: []
+            homeGoodsGuessLike: [],
+            refresherTriggered: false
         };
     },
     computed: {
@@ -81,14 +116,15 @@ export default {
             this.banners = res.result;
         },
         // 前台分类
-        async getHomeCatgoryMutli() {
-            const res = await getHomeCatgoryMutli()
+        async getHomeCategoryMutli() {
+            const res = await getHomeCategoryMutli()
             this.categoryHeadMutli = res.result
         },
         // 热门推荐
         async getHomeHotMutli() {
             const res = await getHomeHotMutli()
             this.hotMutli = res.result
+            console.log(this.hotMutli);
         },
         // 新鲜好物
         async getHomeNewList() {
@@ -112,6 +148,31 @@ export default {
                 await this.getHomeGoodsGuessLike(this.guessParams);
                 this.loading = false
             }
+        },
+        // 下拉事件
+        refresherrefresh(e) {
+            // console.log(e);
+            this.refresherTriggered = true;
+
+            this.banners = [];
+            this.categoryHeadMutli = [];
+            this.hotMutli = [];
+            this.homeNew = [];
+            this.homeGoodsGuessLike = [];
+
+            this.loading = false;
+            this.guessPages = 1;
+            this.guessParams = { page: 1, pageSize: 10 };
+            Promise.all([
+                this.getHomeBanner(),
+                this.getHomeCategoryMutli(),
+                this.getHomeHotMutli(),
+                this.getHomeNewList(),
+                this.getHomeGoodsGuessLike()
+
+            ]).then(() => {
+                this.refresherTriggered = false;
+            });
 
         }
     },

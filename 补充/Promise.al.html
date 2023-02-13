@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        function fn1() {
+            return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    console.log('fn1,一秒完成');
+                    resolve()
+                }, 1000);
+            })
+        }
+        function fn2() {
+            return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    console.log('fn2两秒完成');
+                    resolve()
+                }, 2000);
+            })
+        }
+        function fn3() {
+            return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    console.log('fn3三秒完成');
+                }, 3000);
+            })
+        }
+        Promise.all([fn1(), fn2(), fn3()]).then(() => {
+            console.log('全部完成');
+            console.timeEnd()
+        })
+    </script>
+</body>
+
+</html>
