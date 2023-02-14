@@ -76,12 +76,12 @@ export default {
             if (this.loading) {
                 return
             }
-            this.loading = true
             const currentData = this.recommendList[this.activeIndex]
             // const { page, pages } = this.recommendList.goodsItems
             let { page, pages } = currentData.goodsItems
             const { id } = currentData;
             if (page < pages) {
+                this.loading = true
                 page++
                 const { result: { goodsItems } } = await getHomeRecommend(this.currentItem.url, {
                     subType: id,
