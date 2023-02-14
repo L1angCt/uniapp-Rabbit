@@ -69,12 +69,14 @@ import CollectGoods from './components/CollectGoods.vue'
 import { mapState } from 'vuex';
 
 
+
 export default {
     components: {
         CollectGoods
     },
     computed: {
-        ...mapState(['capsule'])
+        ...mapState(["safeArea", "capsule"]),
+        ...mapState("user", ["profile"]),
     },
     data() {
         return {
@@ -121,7 +123,7 @@ page {
         text-align: center;
         color: #fff;
         font-size: 32rpx;
-        opacity: 1;
+        opacity: 0;
         font-weight: bold;
     }
 }

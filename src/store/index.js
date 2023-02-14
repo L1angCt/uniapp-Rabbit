@@ -1,6 +1,7 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import persistence from 'vuex-uniapp-persistence'
+import user from './user'
 
 Vue.use(Vuex);//vue的插件机制
 // Vuex.store构造器选项
@@ -18,6 +19,8 @@ const store = new Vuex.Store({
       // console.log(123);
     }
   },
-  modules: {},
+  modules: {
+    user
+  },
 });
 export default store;

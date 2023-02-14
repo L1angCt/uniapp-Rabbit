@@ -20,3 +20,34 @@ export const postLoginWxMinSimple = (phoneNumber) => {
         data: { phoneNumber },
     });
 };
+
+/**
+ * 个人信息src\api\profile.js
+ */
+export const getMemberProfile = () => {
+    return http({
+        url: "/member/profile",
+    });
+};
+
+/**
+ * 修改头像
+ */
+export const postMemberProfileAvatar = (data) => {
+    return uni.uploadFile({
+        url: "/member/profile/avatar",
+        filePath: data,
+        name: "file",
+    });
+};
+
+/**
+ * 保存个人信息
+ */
+export const putMemberProfile = (data) => {
+    return http({
+        method: 'put',
+        url: '/member/profile',
+        data
+    })
+}

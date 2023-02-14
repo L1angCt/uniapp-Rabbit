@@ -12,7 +12,7 @@
                 _____________________________________________
             </view>
 
-            <button class="button phone" @click="postLoginWxMinSimple">
+            <button class="button phone" @click="loginWxMinSimple">
                 <text class="icon icon-phone"></text>
                 手机号快捷登录 - 测试
             </button>
@@ -39,7 +39,13 @@
     </view>
 </template>
 <script>
-import { postLoginWxMin, postLoginWxMinSimple } from '@/api/profile'
+import { postLoginWxMin } from '@/api/profile'
+/* 
+     mapActions 语法
+     1. mapActions(['方法名'])  --拿的是 根模块 的数据
+     2. mapActions('模块名',['方法名'])  --拿的是 模块名 的数据
+ */
+import { mapActions } from 'vuex';
 export default {
     async onLoad(options) {
         const [err, { code }] = await uni.login();
@@ -49,6 +55,7 @@ export default {
         }
     },
     methods: {
+        ...mapActions("user", ["postLoginWxMinSimple"]),
         async handleGetPhoneNumber(e) {
             const { encryptedData, iv } = e.detail;
             const res = await postLoginWxMin({
@@ -58,9 +65,12 @@ export default {
             });
             console.log("res -----> ", res);
         },
-        async postLoginWxMinSimple() {
-            const res = await postLoginWxMinSimple(15915876393);
-            console.log("模拟登录 -----> ", res);
+        async loginWxMinSimple() {
+            await this.postLoginWxMinSimple(18598266612);
+            uni.showToast({ title: "登录成功" });
+            setTimeout(() => {
+                uni.navigateBack();
+            }, 1500);
         },
     },
 }
