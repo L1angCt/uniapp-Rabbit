@@ -124,7 +124,6 @@ export default {
         async getHomeHotMutli() {
             const res = await getHomeHotMutli()
             this.hotMutli = res.result
-            console.log(this.hotMutli);
         },
         // 新鲜好物
         async getHomeNewList() {
@@ -151,7 +150,6 @@ export default {
         },
         // 下拉事件
         refresherrefresh(e) {
-            // console.log(e);
             this.refresherTriggered = true;
 
             this.banners = [];

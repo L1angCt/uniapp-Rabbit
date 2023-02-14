@@ -35,17 +35,49 @@
         <view class="add-btn">
             <navigator hover-class="none" url="./form">新建地址</navigator>
         </view>
+        <uni-popup ref="popup" type="dialog">
+            <uni-popup-dialog mode="base" title="是否确认删除" message="成功消息" :duration="2000" :before-close="true"
+                @close="close" @confirm="confirm"></uni-popup-dialog>
+        </uni-popup>
     </view>
 </template>
 
 <script>
+import { getMemberAddress, deleteHomeAddress } from '@/api/address'
 export default {
     data() {
         return {
             // 地址列表
-            addressList: []
+            addressList: [],
+            deleteId: 0
         };
     },
+    onShow() {
+        this.getMemberAddress()
+    },
+    methods: {
+        // 获取地址列表
+        async getMemberAddress() {
+            const res = await getMemberAddress()
+            this.addressList = res.result
+        },
+        // 删除地址
+        async onAddressRemove(id) {
+            this.$refs.popup.open()
+            this.deleteId = id
+        },
+        // 点击弹窗确认
+        async confirm() {
+            const res = await deleteHomeAddress(this.deleteId)
+            this.$refs.popup.close()
+            uni.showToast({ title: "删除成功" });
+            this.getMemberAddress()
+        },
+        // 点击弹窗关闭
+        close() {
+            this.$refs.popup.close()
+        }
+    }
 };
 </script>
 

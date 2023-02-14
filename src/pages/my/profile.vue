@@ -76,9 +76,7 @@ export default {
         }
     },
     onLoad() {
-        console.log(dayjs().format('YYYY-MM-DD'));
         this.end = dayjs().format('YYYY-MM-DD')
-        console.log(this.end);
     },
     onShow(options) {
         this.getMemberProfile();
@@ -89,7 +87,6 @@ export default {
         // src\pages\my\profile.vue
         async getMemberProfile() {
             const res = await getMemberProfile();
-            console.log(res);
             this.memberProfile = res.result
         },
         // 修改头像
@@ -116,7 +113,6 @@ export default {
         },
         // 性别
         genderChange(e) {
-            console.log(e);
             this.memberProfile.gender = e.detail.value
         },
         // 日期
@@ -125,7 +121,6 @@ export default {
         },
         // 城市
         handleFullLocationChange(e) {
-            console.log(e);
             this.memberProfile.fullLocation = e.detail.value.join('')
             const [provinceCode, cityCode, countyCode] = e.detail.code
             this.memberProfile.provinceCode = provinceCode

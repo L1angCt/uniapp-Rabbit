@@ -62,7 +62,6 @@ export default {
         async getCategoryTop() {
             const res = await getCategoryTop()
             this.categoryTop = res.result
-            console.log(res);
         },
         // 获取分类页的banner图
         async getHomeBanner() {

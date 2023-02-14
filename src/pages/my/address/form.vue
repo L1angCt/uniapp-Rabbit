@@ -35,6 +35,7 @@
     </view>
 </template>
 <script>
+import { postHomeAddress } from '@/api/address'
 export default {
     data() {
         return {
@@ -79,6 +80,33 @@ export default {
             }
         };
     },
+    methods: {
+        async submitForm() {
+            const obj = { ...this.form };
+            const res = await postHomeAddress(obj);
+            uni.showToast({ title: "添加成功" });
+            setTimeout(() => {
+                uni.navigateBack();
+            }, 1500);
+        },
+        // 省市区
+        regionChange(e) {
+            const { code, value, postcode } = e.detail;
+            // value 是前端展示的省市区
+            this.form.fullLocation = value.join("");
+            // code 是传递给后端的编码
+            this.form.provinceCode = code[0];
+            this.form.cityCode = code[1];
+            this.form.countyCode = code[2];
+
+            //   邮编，注意微信字段叫 postcode，后台要的是 postalCode
+            this.form.postalCode = postcode;
+        },
+        // 是否默认地址
+        isDefaultChange(e) {
+            this.form.isDefault = e.detail.value ? 1 : 0;
+        },
+    }
 };
 </script>
 

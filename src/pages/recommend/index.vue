@@ -88,7 +88,7 @@ export default {
                     pageSize: 10,
                     page: page
                 })
-                console.log('recommendList', this.recommendList);
+                // console.log('recommendList', this.recommendList);
                 currentData.goodsItems.items = [
                     ...currentData.goodsItems.items,
                     ...goodsItems[id].items

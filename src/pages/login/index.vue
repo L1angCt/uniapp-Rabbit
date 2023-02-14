@@ -51,7 +51,6 @@ export default {
         const [err, { code }] = await uni.login();
         if (!err) {
             this.code = code;
-            console.log("code -----> ", code);
         }
     },
     methods: {
@@ -63,7 +62,6 @@ export default {
                 iv,
                 code: this.code,
             });
-            console.log("res -----> ", res);
         },
         async loginWxMinSimple() {
             await this.postLoginWxMinSimple(18598266612);
