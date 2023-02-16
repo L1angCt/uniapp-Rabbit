@@ -198,17 +198,34 @@
         <uni-popup ref="popup" type="bottom" background-color="#fff">
             <view class="popup-root">
                 <text @click="hideHalfDialog" class="close icon-close"></text>
-                <!-- 4个组件 -->
+                <!-- 4个组件，注意代码判断用的是小写 -->
+                <Sku v-show="layer === 'sku'"></Sku>
+                <Shipment v-show="layer === 'shipment'"></Shipment>
+                <Clause v-show="layer === 'clause'"></Clause>
+                <Helps v-show="layer === 'helps'"></Helps>
             </view>
         </uni-popup>
         <!-- SKU -->
-    </view>
+        <vk-data-goods-sku-popup v-model="isShowSku" :mode="skuMode" :localdata="goodsSku" :amount-type="0" ref="skuRef"
+            @add-cart="onAddCart" @buy-now="onBuyNow" />
+</view>
 </template>
   
 
 <script>
+import Clause from './components/Clause/index.vue'
+import Helps from './components/Helps/index.vue'
+import Shipment from './components/Shipment/index.vue'
+import Sku from './components/Sku/index.vue'
+import { postMemberCart } from '@/api/cart'
 import { getGoods, getGoodsRelevant } from '@/api/goods'
 export default {
+    components: {
+        Clause,
+        Helps,
+        Shipment,
+        Sku
+    },
     onLoad({ id }) {
         this.id = id
         this.getGoods()
@@ -235,22 +252,75 @@ export default {
     },
     computed: {
         // 显示选择好的商品规格信息
-        // selectArrText() {
-        //     console.log(this.$refs.skuRef);
-        //     return this.$refs.skuRef.selectArr.join(" ").trim();
-        // },
+        selectArrText() {
+            console.log(this.$refs.skuRef);
+            return this.$refs.skuRef.selectArr.join(" ").trim();
+        },
     },
     methods: {
         // 获取商品详情
         async getGoods() {
             // console.log(this.id);
             const res = await getGoods(this.id)
+            console.log(res);
             this.goods = res.result
+            this.goodsSku = {
+                _id: this.goods.id,
+                name: this.goods.name,
+                goods_thumb: this.goods.mainPictures[0],
+                //  sku_list - 用户可以选择的sku数组
+                sku_list: this.goods.skus.map((v) => ({
+                    // 商品的skuId
+                    _id: v.id,
+                    // 商品id
+                    goods_id: this.goods.id,
+                    // 商品名
+                    goods_name: this.goods.name,
+                    // 商品主图
+                    image: this.goods.mainPictures[0],
+                    // sku对应的价格
+                    price: v.price,
+                    // sku对应的规格名，如果不对，那就返回 vv.name
+                    sku_name_arr: v.specs.map((vv) => vv.valueName),
+                    // sku对应的库存
+                    stock: v.inventory,
+                })),
+                // spec_list - 所有的规格数组
+                spec_list: this.goods.specs.map((v) => ({
+                    // 规格名字对应的可选值
+                    list: v.values.map((vv) => ({ name: vv.name })),
+                    // 规格名字，颜色，尺寸，内存等
+                    name: v.name,
+                })),
+            }
         },
+        // 猜你喜欢
         async getGoodsRelevant() {
             console.log(this.id);
             const res = await getGoodsRelevant({ id: this.id, limit: 4 })
             this.goodsRelevants = res.result
+        },
+        // 弹窗打开
+        showHalfDialog(layer) {
+            // 1. 显示uni-pop弹出层
+            this.$refs.popup.open("bottom");
+            // 2. 弹出层里面，显示某一个组件即可
+            this.layer = layer;
+        },
+        // 弹窗关闭
+        hideHalfDialog() {
+            this.$refs.popup.close()
+        },
+        // 显示sku插件
+        openSkuPopup(num) {
+            this.isShowSku = true;
+            // 把传过来的类型设置到 skuMode
+            this.skuMode = num;
+        },
+        // 添加到购物车
+        async onAddCart(e) {
+            const res = await postMemberCart({ skuId: e._id, count: e.buy_num })
+            console.log(res);
         }
     }
 };
