@@ -35,8 +35,18 @@
     </view>
 </template>
 <script>
-import { postHomeAddress } from '@/api/address'
+import { postHomeAddress, getHomeAddress, updateHomeAddress } from '@/api/address'
 export default {
+    onLoad({ id }) {
+        if (id) {
+            uni.setNavigationBarTitle({ title: '编辑地址' })
+            this.id = id
+            this.getMemberAddressDetail()
+        } else {
+            //新增
+
+        }
+    },
     data() {
         return {
             form: {
@@ -77,17 +87,30 @@ export default {
                  */
                 receiver: "",
                 fullLocation: "",
-            }
+            },
+            id: null
         };
     },
     methods: {
+        // 保存
         async submitForm() {
-            const obj = { ...this.form };
-            const res = await postHomeAddress(obj);
-            uni.showToast({ title: "添加成功" });
-            setTimeout(() => {
-                uni.navigateBack();
-            }, 1500);
+            if (this.id) {
+                // 编辑地址更新
+                const res = await updateHomeAddress(this.id, this.form)
+                uni.showToast({ title: "修改成功" });
+                setTimeout(() => {
+                    uni.navigateBack();
+                }, 1500);
+            } else {
+                // 新建地址
+                const obj = { ...this.form };
+                const res = await postHomeAddress(obj);
+                uni.showToast({ title: "添加成功" });
+                setTimeout(() => {
+                    uni.navigateBack();
+                }, 1500);
+            }
+
         },
         // 省市区
         regionChange(e) {
@@ -106,7 +129,13 @@ export default {
         isDefaultChange(e) {
             this.form.isDefault = e.detail.value ? 1 : 0;
         },
-    }
+        // 获取地址详情
+        async getMemberAddressDetail() {
+            const { result } = await getHomeAddress(this.id)
+            this.form = result
+        }
+    },
+
 };
 </script>
 

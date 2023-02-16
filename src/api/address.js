@@ -30,3 +30,24 @@ export const deleteHomeAddress = (id) => {
         method: 'delete'
     })
 }
+
+
+/**
+ * 编辑地址
+ */
+export const getHomeAddress = (id) => {
+    return http({
+        url: `/member/address/${id}`,
+    })
+}
+
+/**
+ * 更新地址
+ */
+export const updateHomeAddress = (id, data) => {
+    return http({
+        url: `/member/address/${id}`,
+        method: "put",
+        data
+    })
+}
