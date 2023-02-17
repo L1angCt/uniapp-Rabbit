@@ -6,7 +6,7 @@
                 <!-- 按组使用 -->
                 <uni-swipe-action>
                     <uni-swipe-action-item v-for="item in addressList" :key="item.id" class="swipe-cell">
-                        <view class="item">
+                        <view class="item" @click="addressClick(item)">
                             <view class="user">
                                 {{ item.receiver }}
                                 <text>{{ item.contact }}</text>
@@ -16,7 +16,7 @@
                                 {{ item.fullLocation }}{{ item.address }}
                             </view>
                             <!-- 🐛 添加阻止冒泡 -->
-                            <navigator :url="`./form?id=${item.id}`" class="edit" hover-class="none">
+                            <navigator :url="`./form?id=${item.id}`" class="edit" hover-class="none" @tap.stop="() => { }">
                                 修改
                             </navigator>
                         </view>
@@ -36,14 +36,15 @@
             <navigator hover-class="none" url="./form">新建地址</navigator>
         </view>
         <uni-popup ref="popup" type="dialog">
-            <uni-popup-dialog mode="base" title="是否确认删除" message="成功消息" :duration="2000" :before-close="true"
-                @close="close" @confirm="confirm"></uni-popup-dialog>
+            <uni-popup-dialog mode="base" title="是否确认删除" message="成功消息" :duration="2000" :before-close="true" @close="close"
+                @confirm="confirm"></uni-popup-dialog>
         </uni-popup>
     </view>
 </template>
 
 <script>
 import { getMemberAddress, deleteHomeAddress } from '@/api/address'
+import { mapMutations, mapState } from 'vuex';
 export default {
     data() {
         return {
@@ -56,6 +57,8 @@ export default {
         this.getMemberAddress()
     },
     methods: {
+        ...mapMutations('address', ['setSelectedAddress']),
+        ...mapState('address', ['selectedAddress']),
         // 获取地址列表
         async getMemberAddress() {
             const res = await getMemberAddress()
@@ -76,6 +79,16 @@ export default {
         // 点击弹窗关闭
         close() {
             this.$refs.popup.close()
+        },
+        addressClick(item) {
+            this.setSelectedAddress(item);
+            const pages = getCurrentPages()
+            const currentPage = pages[pages.length - 1]
+            const { from } = currentPage.options
+            if (from === 'order') {
+                // 选择完，直接后退
+                uni.navigateBack();
+            }
         }
     }
 };

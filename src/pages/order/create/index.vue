@@ -40,16 +40,132 @@
             </view>
 
             <!-- 配送及支付方式 -->
+            <view class="related">
+                <view class="item">
+                    <text class="text">配送时间</text>
+                    <text class="picker icon-fonts">{{ payments[0].text }}</text>
+                </view>
+                <view class="item">
+                    <text class="text">支付方式</text>
+                    <text class="picker icon-fonts">{{ shipments[0].text }}</text>
+                </view>
+                <view class="item">
+                    <text class="text">买家备注</text>
+                    <input v-model="buyerMessage" cursor-spacing="30" placeholder="建议留言前先与商家沟通确认" />
+                </view>
+            </view>
 
             <!-- 支付金额 -->
+            <view class="settlement">
+                <view class="item">
+                    <text class="text">商品总价: </text>
+                    <text class="number">
+                        <text class="symbol">¥</text>
+                        {{ orderPre.summary.totalPrice }}元
+                    </text>
+                </view>
+                <view class="item">
+                    <text class="text">运费: </text>
+                    <text class="number">
+                        <text class="symbol">¥</text>
+                        {{ orderPre.summary.postFee }}
+                    </text>
+                </view>
+                <!-- 如果有折扣，渲染折扣金额，没有折扣就不渲染了，免得用户伤心 -->
+                <view class="item" v-if="orderPre.summary.discountPrice > 0">
+                    <text class="text">折扣: </text>
+                    <text class="number danger">
+                        <text class="symbol">-¥</text>
+                        {{ orderPre.summary.discountPrice }}
+                    </text>
+                </view>
+            </view>
         </scroll-view>
 
         <!-- 底部工具 -->
+        <view class="toolbar">
+            <view class="amount">
+                <text class="symbol">¥</text>
+                <text class="number">{{ orderPre.summary.totalPayPrice }}</text>
+            </view>
+            <view @click="submitForm" class="button">提交订单</view>
+        </view>
     </view>
 </template>
 
 <script>
+import { mapState } from 'vuex';
+import { getMemberOrderPre, postMemberOrder } from '@/api/order'
+
 export default {
+    computed: {
+        ...mapState("address", ["selectedAddress"]),
+    },
+    data() {
+        return {
+            // 预付订单列表
+            orderPre: null,
+            // 配送时间
+            payments: [
+                {
+                    id: 1,
+                    text: "时间不限 (周一至周日)",
+                },
+                {
+                    id: 2,
+                    text: "工作日送 (周一至周五)",
+                },
+                {
+                    id: 3,
+                    text: "周末配送 (周六至周日)",
+                },
+            ],
+            // 支付方式
+            shipments: [
+                {
+                    id: 1,
+                    text: "在线支付",
+                },
+                {
+                    id: 2,
+                    text: "货到付款",
+                },
+            ],
+            // 买家留言
+            buyerMessage: "",
+        };
+    },
+    onShow() {
+        this.getMemberOrderPre()
+    },
+    methods: {
+        // 获取订单数据
+        async getMemberOrderPre() {
+            const { result } = await getMemberOrderPre()
+            console.log(result);
+            this.orderPre = result
+        },
+        // 提交订单
+        async submitForm() {
+            const data = {
+                goods: this.orderPre.goods.map((v) => ({
+                    count: v.count,
+                    skuId: v.skuId
+                })),
+                addressId: this.selectedAddress.id,
+                deliveryTimeType: 1,
+                payType: 1,
+                payChannel: 1,
+                buyerMessage: this.buyerMessage
+            }
+            const res = await postMemberOrder(data)
+            uni.showToast({ title: "创建订单成功" })
+            uni.navigateTo({
+                url: `/pages/order/detail?orderId=${res.result.id}`
+            })
+        }
+
+    }
 };
 </script>
 
