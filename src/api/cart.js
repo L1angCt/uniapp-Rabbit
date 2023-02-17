@@ -31,3 +31,25 @@ export const putMemberCart = (skuId, data) => {
         data
     })
 }
+
+/**
+ * 购物车全选/取消全选
+ */
+export const putMemberCartSelected = (data) => {
+    return http({
+        url: '/member/cart/selected',
+        method: 'put',
+        data
+    })
+}
+
+/**
+ * 删除/清空购物车商品
+ */
+export const deleteMemberCart = (data) => {
+    return http({
+        url: '/member/cart',
+        method: 'delete',
+        data
+    })
+}

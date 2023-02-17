@@ -74,23 +74,47 @@
                 <view class="button delete">删除</view>
             </view>
         </view>
-</view>
+    </view>
 </template>
   
 
 <script>
-import { getMemberCart, putMemberCart } from '@/api/cart'
+import { getMemberCart, putMemberCart, putMemberCartSelected, deleteMemberCart } from '@/api/cart'
 import { mapState } from 'vuex';
 export default {
     computed: {
         // 勾选了的购物车数组
-        selectedCarts() { },
+        selectedCarts() {
+            return this.carts.filter((v) => v.selected);
+        },
         // 勾选的商品数量
-        selectedCartsCount() { },
+        selectedCartsCount() {
+            let sum = 0
+            this.selectedCarts.forEach((v) => {
+                sum += v.count
+            })
+            return sum
+        },
         // 勾选的商品总价
-        selectedCartsPrice() { },
+        selectedCartsPrice() {
+            let sum = 0
+            this.selectedCarts.forEach((v) => {
+                sum += v.price * v.count
+            })
+            return sum
+        },
         // 是否全选
-        isSelectedAll() { },
+        isSelectedAll() {
+            // 购物车的数量 === 选中的数量
+            // return this.carts.length === this.selectedCarts.length;
+            /* 
+              every --- 中文意思，每一个，
+              作用就是：对数组的每一项遍历，都符合条件，就返回true
+                        有一项不符合条件，就返回 false
+                        对于空数组，也返回true，所以要做处理
+            */
+            return this.carts.length && this.carts.every((v) => v.selected);
+        },
         ...mapState('user', ['profile'])
     },
     data() {
@@ -120,11 +144,36 @@ export default {
             console.log(res);
             this.getMemberCart();
         },
+        // 改变数量
         async changeCount(skuId, count) {
             console.log("skuId,count -----> ", skuId, count);
             const res = await putMemberCart(skuId, { count });
             this.getMemberCart();
         },
+        // 全选和反选
+        async changeSelectedAll() {
+            // 修改后的状态，等于当前全选按钮的状态，取反
+            let selected = !this.isSelectedAll;
+            const res = await putMemberCartSelected({ selected });
+            this.getMemberCart();
+        },
+        // 删除商品
+        async deleteCart(skuId) {
+            const [err, { confirm }] = await uni.showModal({ title: '删除', content: "您确定要删除吗?" })
+            if (confirm) {
+                // 删除业务
+                const res = await deleteMemberCart({ ids: [skuId] });
+                this.getMemberCart();
+            }
+        },
+        // 结算跳转
+        goToOrderCreate() {
+            if (this.selectedCartsCount === 0) {
+                uni.showToast({ title: "请至少选中一个商品", icon: "none" });
+            } else {
+                uni.navigateTo({ url: "/pages/order/create/index" });
+            }
+        }
     }
 }
 </script>
