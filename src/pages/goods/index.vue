@@ -207,7 +207,7 @@
         </uni-popup>
         <!-- SKU -->
         <vk-data-goods-sku-popup v-model="isShowSku" :mode="skuMode" :localdata="goodsSku" :amount-type="0" ref="skuRef"
-            @add-cart="onAddCart" @buy-now="onBuyNow" />
+            @add-cart="onAddCart" @buy-now="onBuyNow" @close="onClose" />
 </view>
 </template>
   
@@ -247,16 +247,18 @@ export default {
             isShowSku: false,
             // SKU 商品数据
             goodsSku: null,
-            id: null
+            id: null,
+            //   选中的sku规格文本
+            selectArrText: "",
         };
     },
-    computed: {
-        // 显示选择好的商品规格信息
-        selectArrText() {
-            console.log(this.$refs.skuRef);
-            return this.$refs.skuRef.selectArr.join(" ").trim();
-        },
-    },
+    // computed: {
+    //     // 显示选择好的商品规格信息
+    //     selectArrText() {
+    //         console.log(this.$refs.skuRef);
+    //         return this.$refs.skuRef.selectArr.join(" ").trim();
+    //     },
+    // },
     methods: {
         // 获取商品详情
         async getGoods() {
@@ -318,9 +320,20 @@ export default {
             this.skuMode = num;
         },
         // 添加到购物车
-        async onAddCart(e) {
-            const res = await postMemberCart({ skuId: e._id, count: e.buy_num })
-            console.log(res);
+        async onAddCart({ _id: skuId, buy_num: count, sku_name_arr }) {
+            //   console.log("e -----> ", e);
+            this.selectArrText = sku_name_arr.join(" ").trim();
+            const res = await postMemberCart({ skuId, count });
+            uni.showToast({ title: "加购成功" });
+            this.isShowSku = false;
+        },
+        // 跳转购物车
+        goCart() {
+            uni.switchTab({ url: '/pages/cart/index' })
+        },
+        onClose() {
+            // console.log(this.$refs.skuRef);
+            this.selectArrText = this.$refs.skuRef.selectArr.join('').trim()
         }
     }
 };
