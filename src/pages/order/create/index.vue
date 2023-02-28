@@ -161,7 +161,7 @@ export default {
             const res = await postMemberOrder(data)
             uni.showToast({ title: "创建订单成功" })
             uni.navigateTo({
-                url: `/pages/order/detail?orderId=${res.result.id}`
+                url: `/pages/order/detail?id=${res.result.id}`
             })
         }
 

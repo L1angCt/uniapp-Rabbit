@@ -19,3 +19,12 @@ export const postMemberOrder = (data) => {
         data
     })
 }
+
+/**
+ * 获取订单详情
+ */
+export const getMemberOrderDetail = (id) => {
+    return http({
+        url: `/member/order/${id}`
+    })
+}

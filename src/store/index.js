@@ -10,7 +10,8 @@ const store = new Vuex.Store({
   plugins: [persistence()],
   state: {
     safeArea: uni.getSystemInfoSync().safeArea,
-    capsule: uni.getMenuButtonBoundingClientRect()
+    capsule: uni.getMenuButtonBoundingClientRect(),
+    platform: uni.getSystemInfoSync().platform,
 
   },
   getters: {},
@@ -20,8 +21,8 @@ const store = new Vuex.Store({
     }
   },
   modules: {
-    user,
     address,
+    user,
   },
 });
 export default store;
